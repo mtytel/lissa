@@ -1,0 +1,148 @@
+@font-face {
+  font-family: 'myriad-pro-light';
+  src: url(../fnt/MyriadPro-Light.otf);
+}
+@font-face {
+  font-family: 'myriad-pro-regular';
+  src: url(../fnt/MyriadPro-Regular.otf);
+}
+@font-face {
+  font-family: 'myriad-pro-bold';
+  src: url(../fnt/MyriadPro-Bold.otf);
+}
+
+body {
+  background-color:#111;
+  font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+}
+
+h1 {
+  color:#666;
+  padding:0 0 0 0;
+  margin:0 0 0 0;
+}
+
+.info {
+  color:#444;
+  font-style:italic;
+  position:absolute;
+  padding:0;
+  margin:0;
+  bottom:5px;
+  right:10px;
+}
+
+#lissajous {
+  margin-top:30px;
+  display:block;
+  border:1px solid #222;
+}
+
+.minicolors {
+  margin-top:5px;
+  display:block;
+}
+
+.buttons {
+  width:308px;
+  padding-bottom:40px;
+}
+
+.oscillator {
+  width:300px;
+  margin-bottom:17px;
+  padding-left:0.3%;
+  float:left;
+  border-left: 1px solid rgb(80, 80, 80);
+  border-right: 1px solid rgb(80, 80, 80);
+}
+
+.oscillator-title {
+  width:99.7%;
+  background-color:#1a1a1a;
+  padding-top:5px;
+  padding-bottom:5px;
+  text-align:center;
+  color:#888;
+}
+
+.oscillator-group {
+  display:inline;
+  float:left;
+  margin-right:0;
+  border-right: 1px solid rgb(50, 50, 50);
+  padding-top:7px;
+  width:33%;
+  text-align:center;
+  background-color:#151515;
+  color:#aaa;
+}
+
+.oscillator-group:last-child {
+  border-right: none;
+}
+
+.oscillator-group > div {
+  display:block !important;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.oscillator-group > p {
+  padding:0px 0px 0px 0px;
+  margin:0px 0px 10px 0px;
+}
+
+.controls {
+  margin-left:20px;
+  margin-right:30px;
+  padding:3px 10px 10px 10px;
+  width:300px;
+  display:inline;
+  float:left;
+}
+
+.other-controls {
+  text-align:center;
+  color:#aaa;
+}
+
+.other-controls > div p {
+  padding:0px 0px 0px 0px;
+  margin:0px 0px 10px 0px;
+}
+
+.other-controls > div {
+  display:inline-block;
+}
+
+.knob {
+  width:100px;
+  padding-left:100px;
+}
+
+.simple-button {
+  padding: 5px;
+  background-color: rgb(150, 50, 50);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  border: 0px;
+  margin-right:5px;
+  margin-bottom:5px;
+  color: #ddd;
+  width: 149px;
+  height: 27px;
+  font-size:16px;
+  font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+  display:inline;
+  float:left;
+}
+
+.simple-button:hover {
+  background-color: rgb(160, 60, 60);
+}
+
+.simple-button:active {
+  background-color: rgb(140, 40, 40);
+}
