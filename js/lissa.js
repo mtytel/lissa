@@ -196,10 +196,10 @@ lissa.synth = function() {
 lissa.figure = function() {
   var BUFFER_MAX = 2048;
   var BORDER = 10;
-  var WIDTH = 600;
   var COLOR_DECAY = 0.92;
 
   var figure_context_ = null;
+  var canvas_ = null;
   var points = [];
   var red_ = 0, red_target_ = 255;
   var green_ = 0, green_target_ = 255;
@@ -207,15 +207,15 @@ lissa.figure = function() {
 
   function init() {
     // Setup drawing context.
-    var canvas = document.getElementById('lissajous');
-    figure_context_ = canvas.getContext('2d');
+    canvas_ = document.getElementById('lissajous');
+    figure_context_ = canvas_.getContext('2d');
   }
 
   function draw() {
     // Fadeout canvas a little bit.
     figure_context_.globalAlpha = 0.1;
     figure_context_.fillStyle = 'black';
-    figure_context_.fillRect(0, 0, WIDTH + 2 * BORDER, WIDTH + 2 * BORDER);
+    figure_context_.fillRect(0, 0, canvas_.width + 2 * BORDER, canvas_.height + 2 * BORDER);
 
     // Prepare to draw.
     figure_context_.globalAlpha = 1;
@@ -226,8 +226,8 @@ lissa.figure = function() {
 
     // Draw it for Mr. Lissajous.
     for (var i = 1; i < points.length; i += 1) {
-      var x = BORDER + WIDTH / 2 + points[i][0] * WIDTH / 2;
-      var y = BORDER + WIDTH / 2 - points[i][1] * WIDTH / 2;
+      var x = canvas_.width / 2 + points[i][0] * (canvas_.width / 2 - BORDER);
+      var y = canvas_.height / 2 - points[i][1] * (canvas_.height / 2 - BORDER);
 
       figure_context_.fillRect(x, y, 1, 1);
     }
@@ -247,7 +247,6 @@ lissa.figure = function() {
 
   function process(buffer) {
     if (points.length > BUFFER_MAX) {
-      console.log('poop');
       return;
     }
 
