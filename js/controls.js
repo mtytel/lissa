@@ -115,13 +115,13 @@ lissa.controls = function() {
 
     $(".right_osc.sin").knob({
       change :  function(value) {
-        lissa.synth.right().setAmpt('sin', value / 100.0);
+        lissa.synth.right().setAmp('sin', value / 100.0);
       },
     });
 
     $(".right_osc.tri").knob({
       change :  function(value) {
-        lissa.synth.right().setAmpt('tri', value / 100.0);
+        lissa.synth.right().setAmp('tri', value / 100.0);
       },
     });
   });
@@ -172,15 +172,15 @@ lissa.controls = function() {
     $(".right_osc.sin").val(right_sin_amount).trigger('change');
     $(".right_osc.tri").val(right_tri_amount).trigger('change');
 
-    lissa.synth.left.setFreq(
+    lissa.synth.left().setFreq(
         computeFreq(getVal('.base_freq'), left_num, left_den, left_milli));
-    lissa.synth.left.setAmp('sin', left_sin_amount / 100.0);
-    lissa.synth.left.setAmp('tri', left_tri_amount / 100.0);
+    lissa.synth.left().setAmp('sin', left_sin_amount / 100.0);
+    lissa.synth.left().setAmp('tri', left_tri_amount / 100.0);
 
-    lissa.synth.right.setFreq(
+    lissa.synth.right().setFreq(
         computeFreq(getVal('.base_freq'), right_num, right_den, right_milli));
-    lissa.synth.right.setAmp('sin', right_sin_amount / 100.0);
-    lissa.synth.right.setAmp('tri', right_tri_amount / 100.0);
+    lissa.synth.right().setAmp('sin', right_sin_amount / 100.0);
+    lissa.synth.right().setAmp('tri', right_tri_amount / 100.0);
 
     var red = Math.floor(256 * Math.random());
     var green = Math.floor(256 * Math.random());

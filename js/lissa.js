@@ -106,7 +106,7 @@ function oscillator() {
 
   return {
     tick: tick,
-    setFrequency: frequency_.set,
+    setFreq: frequency_.set,
     setPhase: phase_offset_.set,
     setAmp: function(type, val) { amps_[type].set(val); },
   };
@@ -123,11 +123,11 @@ lissa.synth = function() {
 
   function init() {
     left_osc_ = oscillator();
-    left_osc_.setFrequency(DEFAULT_FREQ);
+    left_osc_.setFreq(DEFAULT_FREQ);
     left_osc_.setPhase(0.0);
 
     right_osc_ = oscillator();
-    right_osc_.setFrequency(DEFAULT_FREQ);
+    right_osc_.setFreq(DEFAULT_FREQ);
     right_osc_.setPhase(0.25);
   }
 
