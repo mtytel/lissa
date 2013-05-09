@@ -7,114 +7,119 @@
  *  http://www.gnu.org/licenses/gpl.html
  */
 
-var lissa = {};
+var PI = 3.14159265359;
+var SAMPLE_RATE = 44100.0;
 
-lissa.synth = function() {
+function smooth_value(x, decay_rate_) {
+  var target_ = x;
+  var val_ = 0;
+  function set(x) {
+    target_ = x;
+  }
+  function get() {
+    val_ = decay_rate_ * val_ + (1 - decay_rate_) * target_;
+    return val_;
+  }
+  return {
+    get: get,
+    set: set,
+  };
+}
 
-  var DEFAULT_FREQ = 200.0;
-  var SAMPLE_RATE = 44100.0;
-  var PI = 3.14159265359;
-
+function waveform(type) {
   var SIN_RESOLUTION = 1024;
   var SIN_LOOKUP = [];
   for (var i = 0; i < SIN_RESOLUTION + 1; i++) {
     SIN_LOOKUP.push(Math.sin(2 * PI * i / SIN_RESOLUTION));
   }
-
-  var left_osc_ = null;
-  var right_osc_ = null;
-
-  function oscillator() {
-    var AMP_DECAY = 0.99995;
-    var FREQ_DECAY = 0.997;
-    var PHASE_DECAY = 0.9994;
-
-    var current_phase_ = 0.0;
-    var frequency_ = 0.0, frequency_target_ = 400.0;
-    var phase_offset_ = 0.0, phase_target_ = 0.0;
-    var sin_amp_ = 0.0, sin_target_ = 0.7;
-    var saw_amp_ = 0.0, saw_target_ = 0.0;
-    var sqr_amp_ = 0.0, sqr_target_ = 0.0;
-    var tri_amp_ = 0.0, tri_target_ = 0.0;
-
-    function sin(t) {
-      // Linear interpolate sin lookup for speed (sshhh, no one will notice).
-      var normal = t - Math.floor(t);
-      var index = Math.floor(normal * SIN_RESOLUTION);
-      var prog = normal * SIN_RESOLUTION - index;
-      return (1 - prog) * SIN_LOOKUP[index] + prog * SIN_LOOKUP[index + 1];
-    }
-
-    function sqr(t) {
-      var normal = t - Math.floor(t);
-      if (normal < 0.5)
-        return 1;
-      return -1;
-    }
-
-    function saw(t) {
-      return 2 * (t - Math.floor(t)) - 1;
-    }
-
-    function tri(t) {
-      var normal = t - Math.floor(t);
-      return 1 - 2 * Math.abs(1 - 2 * normal);
-    }
-
-    function setFrequency(freq) {
-      frequency_target_ = freq;
-    }
-
-    function setPhase(phase) {
-      phase_target_ = phase;
-    }
-
-    function setSawAmp(amp) {
-      saw_target_ = amp;
-    }
-
-    function setSinAmp(amp) {
-      sin_target_ = amp;
-    }
-
-    function setSqrAmp(amp) {
-      sqr_target_ = amp;
-    }
-
-    function setTriAmp(amp) {
-      tri_target_ = amp;
-    }
-
-    function tick() {
-      // Smooth values.
-      phase_offset_ = PHASE_DECAY * phase_offset_ + (1 - PHASE_DECAY) * phase_target_;
-      sin_amp_ = AMP_DECAY * sin_amp_ + (1 - AMP_DECAY) * sin_target_;
-      saw_amp_ = AMP_DECAY * saw_amp_ + (1 - AMP_DECAY) * saw_target_;
-      sqr_amp_ = AMP_DECAY * sqr_amp_ + (1 - AMP_DECAY) * sqr_target_;
-      tri_amp_ = AMP_DECAY * tri_amp_ + (1 - AMP_DECAY) * tri_target_;
-      frequency_ = FREQ_DECAY * frequency_ + (1 - FREQ_DECAY) * frequency_target_;
-
-      // Update phase.
-      current_phase_ += frequency_ / SAMPLE_RATE;
-
-      var val = 0.0;
-      val += sin_amp_ * sin(current_phase_ + phase_offset_);
-      val += saw_amp_ * saw(current_phase_ + phase_offset_);
-      val += sqr_amp_ * sqr(current_phase_ + phase_offset_);
-      val += tri_amp_ * tri(current_phase_ + phase_offset_);
-      return val;
-    }
-
-    return {
-      tick: tick,
-      setFrequency: setFrequency,
-      setPhase: setPhase,
-      setSawAmp: setSawAmp,
-      setSinAmp: setSinAmp,
-      setSqrAmp: setSqrAmp,
-      setTriAmp: setTriAmp,
-    };
+  function sin(t) {
+    // Linear interpolate sin lookup for speed (sshhh, no one will notice).
+    var normal = t - Math.floor(t);
+    var index = Math.floor(normal * SIN_RESOLUTION);
+    var prog = normal * SIN_RESOLUTION - index;
+    return (1 - prog) * SIN_LOOKUP[index] + prog * SIN_LOOKUP[index + 1];
   }
+
+  function sqr(t) {
+    var normal = t - Math.floor(t);
+    if (normal < 0.5)
+      return 1;
+    return -1;
+  }
+
+  function saw(t) {
+    return 2 * (t - Math.floor(t)) - 1;
+  }
+
+  function tri(t) {
+    var normal = t - Math.floor(t);
+    return 1 - 2 * Math.abs(1 - 2 * normal);
+  }
+
+  var types = {
+    sine: sin,
+    square: sqr,
+    saw: saw,
+    triangle: tri,
+  };
+
+  function get(t) {
+    return types[type](t);
+  }
+
+  return {
+    get: get,
+  };
+}
+
+function oscillator() {
+  var AMP_DECAY = 0.99995;
+  var FREQ_DECAY = 0.997;
+  var PHASE_DECAY = 0.9994;
+
+  var current_phase_ = 0.0;
+  var frequency_ = smooth_value(400.0, FREQ_DECAY);
+  var phase_offset_ = smooth_value(0.0, PHASE_DECAY);
+  var waves_ = {
+    sin: waveform('sine'),
+    saw: waveform('saw'),
+    sqr: waveform('square'),
+    tri: waveform('triangle'),
+  };
+  var amps_ = {};
+  _.each(waves_, function(w, type) {
+    amps_[type] = smooth_value(0.0, AMP_DECAY);
+  });
+  amps_.sin.set(0.7);
+
+  function tick() {
+    phase_offset = phase_offset_.get();
+    frequency = frequency_.get();
+    current_phase_ += frequency / SAMPLE_RATE;
+
+    var val = 0.0;
+    _.each(waves_, function(w, type) {
+      val += amps_[type].get() * w.get(current_phase_ + phase_offset);
+    });
+    return val;
+  }
+
+  return {
+    tick: tick,
+    setFrequency: frequency_.set,
+    setPhase: phase_offset_.set,
+    setAmp: function(type, val) { amps_[type].set(val); },
+  };
+}
+
+
+var lissa = {};
+
+lissa.synth = function() {
+
+  var DEFAULT_FREQ = 200.0;
+  var left_osc_ = 'cat';
+  var right_osc_ = 'dog';
 
   function init() {
     left_osc_ = oscillator();
@@ -134,38 +139,6 @@ lissa.synth = function() {
     return s;
   }
 
-  function setLeftFreq(freq) {
-    left_osc_.setFrequency(freq);
-  }
-
-  function setLeftPhase(phase) {
-    left_osc_.setPhase(phase);
-  }
-
-  function setRightFreq(freq) {
-    right_osc_.setFrequency(freq);
-  }
-
-  function setRightPhase(phase) {
-    right_osc_.setPhase(phase);
-  }
-
-  function setLeftSinAmp(amp) {
-    left_osc_.setSinAmp(amp);
-  }
-
-  function setLeftTriAmp(amp) {
-    left_osc_.setTriAmp(amp);
-  }
-
-  function setRightSinAmp(amp) {
-    right_osc_.setSinAmp(amp);
-  }
-
-  function setRightTriAmp(amp) {
-    right_osc_.setTriAmp(amp);
-  }
-
   function process(buffer) {
     var output_left = buffer.outputBuffer.getChannelData(0);
     var output_right = buffer.outputBuffer.getChannelData(1);
@@ -175,21 +148,14 @@ lissa.synth = function() {
       output_left[i] = clip(left_osc_.tick());
       output_right[i] = clip(right_osc_.tick());
     }
-
     lissa.figure.process(buffer);
   }
 
   return {
-    init: init,
     process: process,
-    setLeftFreq: setLeftFreq,
-    setLeftPhase: setLeftPhase,
-    setLeftSinAmp: setLeftSinAmp,
-    setLeftTriAmp: setLeftTriAmp,
-    setRightFreq: setRightFreq,
-    setRightPhase: setRightPhase,
-    setRightSinAmp: setRightSinAmp,
-    setRightTriAmp: setRightTriAmp,
+    left: function() { return left_osc_; },
+    right: function() { return right_osc_; },
+    init: init,
   };
 }();
 
@@ -201,9 +167,9 @@ lissa.figure = function() {
   var figure_context_ = null;
   var canvas_ = null;
   var points = [];
-  var red_ = 0, red_target_ = 255;
-  var green_ = 0, green_target_ = 255;
-  var blue_ = 0, blue_target_ = 0;
+  var red_ = smooth_value(255, COLOR_DECAY);
+  var green_ = smooth_value(255, COLOR_DECAY);
+  var blue_ = smooth_value(0, COLOR_DECAY);
 
   function init() {
     // Setup drawing context.
@@ -219,10 +185,10 @@ lissa.figure = function() {
 
     // Prepare to draw.
     figure_context_.globalAlpha = 1;
-    red_ = COLOR_DECAY * red_ + (1 - COLOR_DECAY) * red_target_;
-    green_ = COLOR_DECAY * green_ + (1 - COLOR_DECAY) * green_target_;
-    blue_ = COLOR_DECAY * blue_ + (1 - COLOR_DECAY) * blue_target_;
-    figure_context_.fillStyle = 'rgb(' + Math.floor(red_) + ',' + Math.floor(green_) + ',' + Math.floor(blue_) + ')';
+    red = Math.floor(red_.get());
+    green = Math.floor(green_.get());
+    blue = Math.floor(blue_.get());
+    figure_context_.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
 
     // Draw it for Mr. Lissajous.
     for (var i = 1; i < points.length; i += 1) {
@@ -239,10 +205,10 @@ lissa.figure = function() {
     window.requestAnimationFrame(draw);
   }
 
-  function setColor(red, green, blue) {
-    red_target_ = red;
-    green_target_ = green;
-    blue_target_ = blue;
+  function setColor(r, g, b) {
+    red_.set(r);
+    green_.set(g);
+    blue_.set(b);
   }
 
   function process(buffer) {

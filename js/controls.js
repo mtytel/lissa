@@ -23,12 +23,12 @@ lissa.controls = function() {
 
     $(".base_freq").knob({
       change :  function(base_freq) {
-        lissa.synth.setLeftFreq(computeFreq(base_freq,
+        lissa.synth.left().setFreq(computeFreq(base_freq,
                                             getVal('.left_osc.num'),
                                             getVal('.left_osc.den'),
                                             getVal('.left_osc.milli')));
 
-        lissa.synth.setRightFreq(computeFreq(base_freq,
+        lissa.synth.right().setFreq(computeFreq(base_freq,
                                              getVal('.right_osc.num'),
                                              getVal('.right_osc.den'),
                                              getVal('.right_osc.milli')));
@@ -37,7 +37,7 @@ lissa.controls = function() {
 
     $(".left_osc.num").knob({
       change :  function(num) {
-        lissa.synth.setLeftFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.left().setFreq(computeFreq(getVal('.base_freq'),
                                             num,
                                             getVal('.left_osc.den'),
                                             getVal('.left_osc.milli')));
@@ -46,7 +46,7 @@ lissa.controls = function() {
 
     $(".left_osc.den").knob({
       change :  function(den) {
-        lissa.synth.setLeftFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.left().setFreq(computeFreq(getVal('.base_freq'),
                                             getVal('.left_osc.num'),
                                             den,
                                             getVal('.left_osc.milli')));
@@ -55,7 +55,7 @@ lissa.controls = function() {
 
     $(".left_osc.milli").knob({
       change :  function(milli) {
-        lissa.synth.setLeftFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.left().setFreq(computeFreq(getVal('.base_freq'),
                                             getVal('.left_osc.num'),
                                             getVal('.left_osc.den'),
                                             milli));
@@ -64,25 +64,25 @@ lissa.controls = function() {
 
     $(".left_osc.phase").knob({
       change :  function(value) {
-        lissa.synth.setLeftPhase(value / 360.0);
+        lissa.synth.left().setPhase(value / 360.0);
       },
     });
 
     $(".left_osc.sin").knob({
       change :  function(value) {
-        lissa.synth.setLeftSinAmp(value / 100.0);
+        lissa.synth.left().setAmp('sin', value / 100.0);
       },
     });
 
     $(".left_osc.tri").knob({
       change :  function(value) {
-        lissa.synth.setLeftTriAmp(value / 100.0);
+        lissa.synth.left().setAmp('tri', value / 100.0);
       },
     });
 
     $(".right_osc.num").knob({
       change :  function(num) {
-        lissa.synth.setRightFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.right().setFreq(computeFreq(getVal('.base_freq'),
                                             num,
                                             getVal('.right_osc.den'),
                                             getVal('.right_osc.milli')));
@@ -91,7 +91,7 @@ lissa.controls = function() {
 
     $(".right_osc.den").knob({
       change :  function(den) {
-        lissa.synth.setRightFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.right().setFreq(computeFreq(getVal('.base_freq'),
                                             getVal('.right_osc.num'),
                                             den,
                                             getVal('.right_osc.milli')));
@@ -100,7 +100,7 @@ lissa.controls = function() {
 
     $(".right_osc.milli").knob({
       change :  function(milli) {
-        lissa.synth.setRightFreq(computeFreq(getVal('.base_freq'),
+        lissa.synth.right().setFreq(computeFreq(getVal('.base_freq'),
                                             getVal('.right_osc.num'),
                                             getVal('.right_osc.den'),
                                             milli));
@@ -109,19 +109,19 @@ lissa.controls = function() {
 
     $(".right_osc.phase").knob({
       change :  function(value) {
-        lissa.synth.setRightPhase(value / 360.0);
+        lissa.synth.right().setPhase(value / 360.0);
       },
     });
 
     $(".right_osc.sin").knob({
       change :  function(value) {
-        lissa.synth.setRightSinAmp(value / 100.0);
+        lissa.synth.right().setAmpt('sin', value / 100.0);
       },
     });
 
     $(".right_osc.tri").knob({
       change :  function(value) {
-        lissa.synth.setRightTriAmp(value / 100.0);
+        lissa.synth.right().setAmpt('tri', value / 100.0);
       },
     });
   });
@@ -172,15 +172,15 @@ lissa.controls = function() {
     $(".right_osc.sin").val(right_sin_amount).trigger('change');
     $(".right_osc.tri").val(right_tri_amount).trigger('change');
 
-    lissa.synth.setLeftFreq(
+    lissa.synth.left.setFreq(
         computeFreq(getVal('.base_freq'), left_num, left_den, left_milli));
-    lissa.synth.setLeftSinAmp(left_sin_amount / 100.0);
-    lissa.synth.setLeftTriAmp(left_tri_amount / 100.0);
+    lissa.synth.left.setAmp('sin', left_sin_amount / 100.0);
+    lissa.synth.left.setAmp('tri', left_tri_amount / 100.0);
 
-    lissa.synth.setRightFreq(
+    lissa.synth.right.setFreq(
         computeFreq(getVal('.base_freq'), right_num, right_den, right_milli));
-    lissa.synth.setRightSinAmp(right_sin_amount / 100.0);
-    lissa.synth.setRightTriAmp(right_tri_amount / 100.0);
+    lissa.synth.right.setAmp('sin', right_sin_amount / 100.0);
+    lissa.synth.right.setAmp('tri', right_tri_amount / 100.0);
 
     var red = Math.floor(256 * Math.random());
     var green = Math.floor(256 * Math.random());
