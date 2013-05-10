@@ -118,18 +118,14 @@ var lissa = {};
 lissa.synth = function() {
 
   var DEFAULT_FREQ = 200.0;
-  var left_osc_ = 'cat';
-  var right_osc_ = 'dog';
 
-  function init() {
-    left_osc_ = oscillator();
-    left_osc_.setFreq(DEFAULT_FREQ);
-    left_osc_.setPhase(0.0);
+  var left_osc_ = oscillator();
+  left_osc_.setFreq(DEFAULT_FREQ);
+  left_osc_.setPhase(0.0);
 
-    right_osc_ = oscillator();
-    right_osc_.setFreq(DEFAULT_FREQ);
-    right_osc_.setPhase(0.25);
-  }
+  var right_osc_ = oscillator();
+  right_osc_.setFreq(DEFAULT_FREQ);
+  right_osc_.setPhase(0.25);
 
   function clip(s) {
     if (s >= 1)
@@ -153,9 +149,8 @@ lissa.synth = function() {
 
   return {
     process: process,
-    left: function() { return left_osc_; },
-    right: function() { return right_osc_; },
-    init: init,
+    left: left_osc_,
+    right: right_osc_,
   };
 }();
 
@@ -236,7 +231,6 @@ lissa.figure = function() {
 lissa.init = function() {
   var context = new webkitAudioContext();
   lissa.figure.init();
-  lissa.synth.init();
 
   var synth_source = context.createScriptProcessor(512, 0, 2);
   synth_source.onaudioprocess = lissa.synth.process;
