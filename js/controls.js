@@ -19,7 +19,7 @@ lissa.controls = function() {
   }
 
   // TODO: So repetitive... Fix with IDs or something.
-  $(function($) {
+  (function($) {
 
     $(".base_freq").knob({
       change :  function(base_freq) {
@@ -87,7 +87,7 @@ lissa.controls = function() {
                                             getVal('.right_osc.den'),
                                             getVal('.right_osc.milli')));
       },
-    });
+    })
 
     $(".right_osc.den").knob({
       change :  function(den) {
@@ -124,7 +124,7 @@ lissa.controls = function() {
         lissa.synth.right.setAmp('tri', value / 100.0);
       },
     });
-  });
+  })(jQuery);
 
   function randomize() {
     // Randomize the knobs within some limits, I think it'll sound nice.
