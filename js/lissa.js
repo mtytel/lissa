@@ -230,18 +230,6 @@ lissa.process = function(buffer) {
   lissa.synth.process(buffer);
   lissa.figure.process(buffer.outputBuffer.getChannelData(0),
                        buffer.outputBuffer.getChannelData(1));
-}
+};
 
-lissa.init = function() {
-  var context = new webkitAudioContext();
-  lissa.figure.init();
-  lissa.synth.init();
 
-  var synth_source = context.createScriptProcessor(512, 0, 2);
-  synth_source.onaudioprocess = lissa.process;
-
-  synth_source.connect(context.destination);
-  lissa.figure.draw();
-}
-
-window.onload = lissa.init;
