@@ -244,26 +244,25 @@ lissa.process = function(buffer) {
 }
 
 lissa.init = function() {
+  if(!('webkitAudioContext' in window)) {
+    alert("This uses the Web Audio API, try opening it in Google Chrome.");
+    return;
+  }
+
   var context = new webkitAudioContext();
   lissa.figure.init();
   lissa.synth.init();
 
-  lissa.processor = context.createScriptProcessor(1024, 0, 2);
-  lissa.processor.onaudioprocess = lissa.process;
+  var synth_processor = context.createScriptProcessor(1024, 0, 2);
+  synth_processor.onaudioprocess = lissa.process;
 
-  lissa.processor.connect(context.destination);
+  synth_processor.connect(context.destination);
   lissa.figure.draw();
   if (document.hasFocus)
     window.focus();
 }
 
 lissa.active = false;
-lissa.setActive = function() {
-  lissa.active = true;
-}
-lissa.setInactive = function() {
-  lissa.active = false;
-}
 
 window.onload = lissa.init;
 $(window).focus(function() { lissa.active = true; });
