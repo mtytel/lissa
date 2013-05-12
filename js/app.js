@@ -1,29 +1,27 @@
 lissa.init = function($) {
+  if(!('webkitAudioContext' in window)) {
+    alert("This uses the Web Audio API, try opening it in Google Chrome.");
+    return;
+  }
+
   var context = new webkitAudioContext();
   lissa.figure.init();
   lissa.synth.init();
 
-  var synth_source = context.createScriptProcessor(512, 0, 2);
-  synth_source.onaudioprocess = lissa.process;
+  var synth_processor = context.createScriptProcessor(1024, 0, 2);
+  synth_processor.onaudioprocess = lissa.process;
 
-  synth_source.connect(context.destination);
+  synth_processor.connect(context.destination);
   lissa.figure.draw();
 
   lissa.controls.init($('.controls'));
 
-  $('.minicolors').each(function() {
-    $(this).minicolors({
-      animationSpeed: 0,
-      position: 'top',
-      textfield: !$(this).hasClass('no-textfield'),
-      change: function(hex, opacity) {
-        var red = parseInt(hex.substring(1, 3), 16);
-        var green = parseInt(hex.substring(3, 5), 16);
-        var blue = parseInt(hex.substring(5, 7), 16);
-        lissa.figure.setColor(red, green, blue);
-      },
-    });
-  });
+  $(window).focus(function() { lissa.active = true; });
+  $(window).blur(function() { lissa.active = false; });
+
+  lissa.active = false;
+  if (document.hasFocus)
+    window.focus();
 };
 
 (function($){

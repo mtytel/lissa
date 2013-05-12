@@ -10,7 +10,6 @@
 var lissa = {};
 lissa.constants = {};
 
-lissa.constants.PI = 3.14159265359;
 lissa.constants.SAMPLE_RATE = 44100.0;
 
 lissa.smoothValue = function(x, decay_rate) {
@@ -39,7 +38,7 @@ lissa.waveforms = function() {
   var SIN_RESOLUTION = 1024;
   var SIN_LOOKUP = [];
   for (var i = 0; i < SIN_RESOLUTION + 1; i++) {
-    SIN_LOOKUP.push(Math.sin(2 * lissa.constants.PI * i / SIN_RESOLUTION));
+    SIN_LOOKUP.push(Math.sin(2 * Math.PI * i / SIN_RESOLUTION));
   }
 
   function saw(t) {
@@ -156,7 +155,7 @@ lissa.synth = function() {
 }();
 
 lissa.figure = function() {
-  var BUFFER_MAX = 2048;
+  var BUFFER_MAX = 4096;
   var BORDER = 10;
   var COLOR_DECAY = 0.92;
 
@@ -227,9 +226,19 @@ lissa.figure = function() {
 }();
 
 lissa.process = function(buffer) {
-  lissa.synth.process(buffer);
-  lissa.figure.process(buffer.outputBuffer.getChannelData(0),
-                       buffer.outputBuffer.getChannelData(1));
-};
+  if (lissa.active) {
+    lissa.synth.process(buffer);
+    lissa.figure.process(buffer.outputBuffer.getChannelData(0),
+                         buffer.outputBuffer.getChannelData(1));
+  }
+  else {
+    var output_left = buffer.outputBuffer.getChannelData(0);
+    var output_right = buffer.outputBuffer.getChannelData(1);
 
-
+    var size = output_left.length;
+    for (var i = 0; i < size; ++i) {
+      output_left[i] = 0.0;
+      output_right[i] = 0.0;
+    }
+  }
+}
