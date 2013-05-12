@@ -231,6 +231,16 @@ lissa.process = function(buffer) {
     lissa.figure.process(buffer.outputBuffer.getChannelData(0),
                          buffer.outputBuffer.getChannelData(1));
   }
+  else {
+    var output_left = buffer.outputBuffer.getChannelData(0);
+    var output_right = buffer.outputBuffer.getChannelData(1);
+
+    var size = output_left.length;
+    for (var i = 0; i < size; ++i) {
+      output_left[i] = 0.0;
+      output_right[i] = 0.0;
+    }
+  }
 }
 
 lissa.init = function() {
@@ -243,10 +253,17 @@ lissa.init = function() {
 
   lissa.processor.connect(context.destination);
   lissa.figure.draw();
-  lissa.active = document.hasFocus;
+  if (document.hasFocus)
+    window.focus();
 }
 
 lissa.active = false;
+lissa.setActive = function() {
+  lissa.active = true;
+}
+lissa.setInactive = function() {
+  lissa.active = false;
+}
 
 window.onload = lissa.init;
 $(window).focus(function() { lissa.active = true; });
