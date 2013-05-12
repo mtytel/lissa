@@ -1,4 +1,4 @@
-$(document).ready(function() {
+lissa.init = function($) {
   var context = new webkitAudioContext();
   lissa.figure.init();
   lissa.synth.init();
@@ -8,7 +8,9 @@ $(document).ready(function() {
 
   synth_source.connect(context.destination);
   lissa.figure.draw();
-  
+
+  lissa.controls.init($('.controls'));
+
   $('.minicolors').each(function() {
     $(this).minicolors({
       animationSpeed: 0,
@@ -22,5 +24,10 @@ $(document).ready(function() {
       },
     });
   });
+};
 
-});
+(function($){
+  $(document).ready(function(){
+    lissa.init($);
+  });
+})(jQuery);

@@ -7,125 +7,219 @@
  *  http://www.gnu.org/licenses/gpl.html
  */
 
-lissa.controls = function() {
+lissa.templates = function() {
+  function init($) {
+    $('script[type="underscore/template"]').each(function(){
+      var tmpl = null;
+      var $this = $(this);
+      var id = $(this).attr('id');
+      try {
+        tmpl = _.template($this.text());
+      } catch (error) {
+        console.log('Error compiling template', id, error);
+      }
+      this.templates[id] = function() {
+        try {
+          return tmpl.apply(this, arguments);
+        } catch (error) {
+          console.log('Error executing template', id, error);
+        }
+      };
+    });
+  }
+  return {
+    templates: {},
+    init: init,
+  };
+}();
+
+lissa.controls = {};
+
+lissa.controls.knob = function($container, f, settings) {
+  var $knob;
+
+  function render() {
+    $container.append(lissa.templates.templates.knob(settings));
+    $knob = $container.find('#'+settings.id).first();
+    $knob.knob({change: f});
+  }
+
+  function getVal() {
+    return parseInt($knob.val());
+  }
+
+  function setVal(val) {
+    $knob.val(val).trigger('change');
+  }
+
+  return {
+    render: render,
+    getVal: getVal,
+    setVal: setVal,
+  };
+};
+
+lissa.controls.knobGroup = function(knob_args, f) {
+
+  var knobs = {};
+
+  function on_change() {
+    var vals = [];
+    _.each(knobs, function(knob) {
+      vals.append(knob.getVal());
+    });
+    return f(vals);
+  }
+
+  function render() {
+    _.each(knob_args, function(args) {
+      knobs[args.settings.id] = lissa.controls.knob(args.$container, on_change, args.settings);
+    });
+  }
+
+  function getVal(id) {
+    return knobs[id].getVal();
+  }
+
+  function setVal(id, val) {
+    return knobs[id].setVal(val);
+  }
+
+  return {
+    render: render,
+    getVal: getVal,
+    setVal: setVal,
+  };
+};
+
+lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
+  // model is a lissa.oscillator()
+
+  var freq_knob_group = null;
+  var phase_knob = null;
+  var sin_knob = null;
+  var tri_knob = null;
+
+  function render() {
+    var $el = lissa.templates.templates.oscillator({});
+    $container.append($el);
+
+    var $col1 = $container.find('.knob-column.col-1').first();
+    var $col2 = $container.find('.knob-column.col-2').first();
+    var $col3 = $container.find('.knob-column.col-3').first();
+
+    freq_knob_group = lissa.controls.knobGroup(
+      [ {
+          $container: $col1,
+          settings: {
+            label: 'MULTIPLY',
+            min_val: 1,
+            max_val: 12,
+            default_val: 1,
+          }
+        }, {
+          $container: $col1,
+          settings: {
+            label: 'DIVIDE',
+            min_val: 1,
+            max_val: 12,
+            default_val: 1,
+          }
+        }, {
+          $container: $col2,
+          settings: {
+            label: 'DETUNE',
+            min_val: -100,
+            max_val: 100,
+            default_val: 0,
+          }
+      } ],
+      function(num, den, milli) {
+        model.setFreq(base_freq.knob.getVal() * (1.0 * num / den) * Math.pow(2, milli / 12000.0));
+      }
+    );
+
+    phase_knob = lissa.controls.knob(
+      $col2,
+      model.setPhase,
+      {
+        label: 'PHASE',
+        min_val: -180,
+        max_val: 180,
+        default_val: 0,
+      }
+    );
+
+    sin_knob = lissa.controls.knob(
+      $col3,
+      function(val){
+        return model.setAmp('sin', val);
+      },
+      {
+        label: 'SIN',
+        min_val: 0,
+        max_val: 100,
+        default_val: 70,
+      }
+    );
+
+    tri_knob = lissa.controls.knob(
+      $col3,
+      function(val){
+        return model.setAmp('tri', val);
+      },
+      {
+        label: 'TRI',
+        min_val: 0,
+        max_val: 100,
+        default_val: 70,
+      }
+    );
+  }
+
+  function updateFreq() {
+    freq_knob_group.items[0].trigger('change');
+  }
+
+  return {
+    updateFreq: updateFreq,
+  };
+};
+
+lissa.controls.init = function($container) {
   var playing_id_ = false;
 
-  function computeFreq(base, num, den, milli) {
-    return base * (1.0 * num / den) * Math.pow(2, milli / 12000.0);
-  }
+  var base_freq_knob = lissa.controls.knob(
+    $container.find('#base_freq').first(),
+    function(val) {
+      left_oscillator_control.updateFreq();
+      right_oscillator_control.updateFreq();
+    },
+    {
+      label: 'BASE FREQUENCY',
+      min_val: 1,
+      max_val: 500,
+      default_val: 200,
+    }
+  );
 
-  function getVal(classes) {
-    return parseInt($(classes).val());
-  }
+  var left_oscillator_control = lissa.controls.oscillator(
+    $container.find('#left-oscillator').first(),
+    'Left Oscillator - X',
+    lissa.synth.left,
+    base_freq_knob
+  );
 
-  // TODO: So repetitive... Fix with IDs or something.
-  (function($) {
+  var right_oscillator_control = lissa.controls.oscillator(
+    $container.find('#right-oscillator').first(),
+    'Right Oscillator - Y',
+    lissa.synth.right,
+    base_freq_knob
+  );
 
-    $(".base_freq").knob({
-      change :  function(base_freq) {
-        lissa.synth.left.setFreq(computeFreq(base_freq,
-                                            getVal('.left_osc.num'),
-                                            getVal('.left_osc.den'),
-                                            getVal('.left_osc.milli')));
+};
 
-        lissa.synth.right.setFreq(computeFreq(base_freq,
-                                             getVal('.right_osc.num'),
-                                             getVal('.right_osc.den'),
-                                             getVal('.right_osc.milli')));
-      },
-    });
-
-    $(".left_osc.num").knob({
-      change :  function(num) {
-        lissa.synth.left.setFreq(computeFreq(getVal('.base_freq'),
-                                            num,
-                                            getVal('.left_osc.den'),
-                                            getVal('.left_osc.milli')));
-      },
-    });
-
-    $(".left_osc.den").knob({
-      change :  function(den) {
-        lissa.synth.left.setFreq(computeFreq(getVal('.base_freq'),
-                                            getVal('.left_osc.num'),
-                                            den,
-                                            getVal('.left_osc.milli')));
-      },
-    });
-
-    $(".left_osc.milli").knob({
-      change :  function(milli) {
-        lissa.synth.left.setFreq(computeFreq(getVal('.base_freq'),
-                                            getVal('.left_osc.num'),
-                                            getVal('.left_osc.den'),
-                                            milli));
-      },
-    });
-
-    $(".left_osc.phase").knob({
-      change :  function(value) {
-        lissa.synth.left.setPhase(value / 360.0);
-      },
-    });
-
-    $(".left_osc.sin").knob({
-      change :  function(value) {
-        lissa.synth.left.setAmp('sin', value / 100.0);
-      },
-    });
-
-    $(".left_osc.tri").knob({
-      change :  function(value) {
-        lissa.synth.left.setAmp('tri', value / 100.0);
-      },
-    });
-
-    $(".right_osc.num").knob({
-      change :  function(num) {
-        lissa.synth.right.setFreq(computeFreq(getVal('.base_freq'),
-                                            num,
-                                            getVal('.right_osc.den'),
-                                            getVal('.right_osc.milli')));
-      },
-    })
-
-    $(".right_osc.den").knob({
-      change :  function(den) {
-        lissa.synth.right.setFreq(computeFreq(getVal('.base_freq'),
-                                            getVal('.right_osc.num'),
-                                            den,
-                                            getVal('.right_osc.milli')));
-      },
-    });
-
-    $(".right_osc.milli").knob({
-      change :  function(milli) {
-        lissa.synth.right.setFreq(computeFreq(getVal('.base_freq'),
-                                            getVal('.right_osc.num'),
-                                            getVal('.right_osc.den'),
-                                            milli));
-      },
-    });
-
-    $(".right_osc.phase").knob({
-      change :  function(value) {
-        lissa.synth.right.setPhase(value / 360.0);
-      },
-    });
-
-    $(".right_osc.sin").knob({
-      change :  function(value) {
-        lissa.synth.right.setAmp('sin', value / 100.0);
-      },
-    });
-
-    $(".right_osc.tri").knob({
-      change :  function(value) {
-        lissa.synth.right.setAmp('tri', value / 100.0);
-      },
-    });
-  })(jQuery);
-
+/*
   function randomize() {
     // Randomize the knobs within some limits, I think it'll sound nice.
     function random_int(low, high) {
@@ -200,3 +294,4 @@ lissa.controls = function() {
     randomize: randomize,
   };
 }();
+*/

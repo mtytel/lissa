@@ -66,7 +66,7 @@ h1 {
   color:#888;
 }
 
-.oscillator-group {
+.knob-column {
   display:inline;
   float:left;
   margin-right:0;
@@ -78,17 +78,17 @@ h1 {
   color:#aaa;
 }
 
-.oscillator-group:last-child {
+.knob-column:last-child {
   border-right: none;
 }
 
-.oscillator-group > div {
+.knob-column > div {
   display:block !important;
   margin-left:auto;
   margin-right:auto;
 }
 
-.oscillator-group > p {
+.knob-column > p {
   padding:0px 0px 0px 0px;
   margin:0px 0px 10px 0px;
 }
