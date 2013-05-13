@@ -9,7 +9,7 @@
 
 lissa.init = function($) {
   if(!('webkitAudioContext' in window)) {
-    alert("This uses the Web Audio API, try opening it in Google Chrome.");
+    alert("This uses the Web Audio API. Try opening it in Google Chrome.");
     return;
   }
 
