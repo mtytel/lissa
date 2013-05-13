@@ -17,30 +17,19 @@
     <div class="container">
       <div class="controls">
         <div class="buttons">
-          <button class="simple-button randomize" onclick="lissa.controls.randomize()">
+          <button class="simple-button randomize">
             Randomize
           </button>
-          <button class="simple-button play" onclick="lissa.controls.togglePlaying()">
+          <button class="simple-button play">
             Play me a song!
           </button>
         </div>
-        <div id="left-oscillator" class="oscillator">
+        <div id="left-oscillator">
         </div>
-        <div id="right-oscillator" class="oscillator">
+        <div id="right-oscillator">
         </div>
         <div class="other-controls">
           <div id="base_freq">
-            <input class="knob base_freq"
-            data-angleOffset=225
-            data-angleArc=270
-            data-bgColor="#222222"
-            data-fgColor="#888888"
-            data-width="72"
-            data-height="72"
-            data-min=1
-            data-max=500
-            value="200">
-            <p>BASE FREQUENCY</p>
           </div>
         </div>
       </div>
@@ -56,5 +45,35 @@
       </a>
       </div>
     </div>
+
+    <script type="underscore/template" id="knob">
+      <input
+        class="knob"
+        id="<%=id%>"
+        data-angleOffset=225
+        data-angleArc=270
+        data-bgColor="#222222"
+        data-fgColor="#888888"
+        data-width="72"
+        data-height="72"
+        data-min=<%=min_val%>
+        data-max=<%=max_val%>
+        value="<%=default_val%>">
+      <p><%=label%></p>
+    </script>
+
+    <script type="underscore/template" id="oscillator">
+      <div class="oscillator">
+        <div class="oscillator-title">
+          <%=title%>
+        </div>
+        <div class="knob-column col-1">
+        </div>
+        <div class="knob-column col-2">
+        </div>
+        <div class="knob-column col-3">
+        </div>
+      </div>
+    </script>
   </body>
 </html>

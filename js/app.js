@@ -4,6 +4,7 @@ lissa.init = function($) {
     return;
   }
 
+  lissa.templates.init();
   var context = new webkitAudioContext();
   lissa.figure.init();
   lissa.synth.init();
