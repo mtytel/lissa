@@ -20,7 +20,7 @@ lissa.init = function($) {
   $(window).focus(function() { lissa.active = true; });
   $(window).blur(function() { lissa.active = false; });
 
-  lissa.active = false;
+  lissa.active = true;
   if (document.hasFocus)
     window.focus();
 };
