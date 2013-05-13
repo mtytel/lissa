@@ -1,48 +1,13 @@
 /**
  * Lissa Juice: Online audio visualization
  *
+ * Matt Tytel and Noura Howell
+ *
  * Copyright (c) 2013
  * Under MIT and GPL licenses:
  *  http://www.opensource.org/licenses/mit-license.php
  *  http://www.gnu.org/licenses/gpl.html
  */
-
-lissa.templates = function() {
-  // http://underscorejs.org/#template
-  // The skinny: Templates are super helpful for dynamically creating HTML
-  // that gets used multiple times, but with a few parameters changed.
-  // Underscore templates are sweet because you can pass in an arbitrary
-  // JavaScript object and execute JavaScript code inside the template.
-  function init() {
-    // a wrapper around _.template to give error messages
-    var that = this;
-    $('script[type="underscore/template"]').each(function() {
-      var template = null;
-      var $this = $(this);
-      var id = $(this).attr('id');
-
-      try {
-        template = _.template($this.text());
-      }
-      catch (error) {
-        console.log('Error compiling template', id, error);
-      }
-
-      that.templates[id] = function() {
-        try {
-          return template.apply(this, arguments);
-        }
-        catch (error) {
-          console.log('Error executing template', id, error);
-        }
-      };
-    });
-  }
-  return {
-    templates: {},
-    init: init,
-  };
-}();
 
 lissa.controls = {};
 
@@ -317,3 +282,41 @@ lissa.controls.init = function($container) {
   var randomizer = lissa.controls.randomizer($container, [right_oscillator_control, left_oscillator_control, minicolors]);
   randomizer.init();
 };
+
+lissa.templates = function() {
+  // http://underscorejs.org/#template
+  // The skinny: Templates are super helpful for dynamically creating HTML
+  // that gets used multiple times, but with a few parameters changed.
+  // Underscore templates are sweet because you can pass in an arbitrary
+  // JavaScript object and execute JavaScript code inside the template.
+  function init() {
+    // a wrapper around _.template to give error messages
+    var that = this;
+    $('script[type="underscore/template"]').each(function() {
+      var template = null;
+      var $this = $(this);
+      var id = $(this).attr('id');
+
+      try {
+        template = _.template($this.text());
+      }
+      catch (error) {
+        console.log('Error compiling template', id, error);
+      }
+
+      that.templates[id] = function() {
+        try {
+          return template.apply(this, arguments);
+        }
+        catch (error) {
+          console.log('Error executing template', id, error);
+        }
+      };
+    });
+  }
+  return {
+    templates: {},
+    init: init,
+  };
+}();
+

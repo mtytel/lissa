@@ -1,3 +1,12 @@
+/**
+ * Lissa Juice: Online audio visualization
+ *
+ * Copyright (c) 2013
+ * Under MIT and GPL licenses:
+ *  http://www.opensource.org/licenses/mit-license.php
+ *  http://www.gnu.org/licenses/gpl.html
+ */
+
 lissa.init = function($) {
   if(!('webkitAudioContext' in window)) {
     alert("This uses the Web Audio API, try opening it in Google Chrome.");
