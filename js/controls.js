@@ -129,7 +129,11 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     freq_milli_knob = lissa.controls.knob($col2, setFreq, freq_milli_knob_settings);
     freq_milli_knob.render();
 
-    phase_knob = lissa.controls.knob($col2, model.setPhase, phase_knob_settings);
+    phase_knob = lissa.controls.knob($col2,
+      function(val) {
+        model.setPhase(val / 360);
+      }, 
+      phase_knob_settings);
     phase_knob.render();
 
     function wave_amp_setter(type, max) {
