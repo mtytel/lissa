@@ -30,9 +30,14 @@ lissa.smoothValue = function(x, decay_rate) {
     return val_;
   }
 
+  function get() {
+    return target_;
+  }
+
   return {
     tick: tick,
     set: set,
+    get: get,
   };
 }
 
@@ -105,11 +110,25 @@ lissa.oscillator = function() {
       amps_[type] = lissa.smoothValue(val, AMP_DECAY);
   }
 
+  function getAmp(type) {
+    if (amps_[type]) {
+      console.log('type', type, 'is known', amps_[type]);
+      return amps_[type].get();
+    }
+    else {
+      console.log('type', type, 'is unknown');
+      return 0;
+    }
+  }
+
   return {
     tick: tick,
     setFreq: frequency_.set,
     setPhase: phase_offset_.set,
     setAmp: setAmp,
+    getFreq: frequency_.get,
+    getPhase: phase_offset_.get,
+    getAmp: getAmp,
   };
 }
 

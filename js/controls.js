@@ -77,23 +77,22 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
     label: 'PHASE',
     min_val: -180,
     max_val: 180,
-    default_val: 0,
+    default_val: model.getPhase() * 360,
     id: get_id('phase-knob'),
   };
 
-  //TODO get default values from model
   var sin_knob_settings = {
     label: 'SIN',
     min_val: 0,
     max_val: 100,
-    default_val: 70,
+    default_val: model.getAmp('sin') * 100,
     id: get_id('sin-knob'),
   };
   var tri_knob_settings = {
     label: 'TRI',
     min_val: 0,
     max_val: 100,
-    default_val: 0,
+    default_val: model.getAmp('tri') * 100,
     id: get_id('tri-knob'),
   };
 
