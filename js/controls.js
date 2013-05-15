@@ -43,6 +43,8 @@ lissa.controls.knob = function($container, f, settings) {
 lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
   // model is a lissa.oscillator()
 
+  var id_prefix = $container.attr('id');
+
   var freq_num_knob = null;
   var freq_den_knob = null;
   var freq_milli_knob = null;
@@ -104,7 +106,6 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
   }
 
   // $container.attr('id') is used to prefix the ids of the knobs
-  var id_prefix = $container.attr('id');
   function get_id(s) {
     return id_prefix + '-' + s;
   }
