@@ -112,11 +112,9 @@ lissa.oscillator = function() {
 
   function getAmp(type) {
     if (amps_[type]) {
-      console.log('type', type, 'is known', amps_[type]);
       return amps_[type].get();
     }
     else {
-      console.log('type', type, 'is unknown');
       return 0;
     }
   }
