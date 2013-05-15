@@ -22,6 +22,9 @@ lissa.controls.knob = function($container, f, settings) {
     $container.append(lissa.templates.templates.knob(settings));
     $knob = $container.find('#'+settings.id).first();
     $knob.knob({change: f});
+    $knob.on('change', function(ev) {
+      f($knob.val());
+    });
   }
 
   function getVal() {
