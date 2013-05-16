@@ -211,7 +211,7 @@ lissa.controls.minicolors = function($container) {
 lissa.controls.randomizer = function($container, items) {
   var $randomize_button = $container.find('.randomize').first();
   var $play_button = $container.find('.play').first();
-  var now_playing = false;
+  var playing_id = 0;
 
   function init() {
     $randomize_button.on('click', randomize);
@@ -231,13 +231,14 @@ lissa.controls.randomizer = function($container, items) {
   }
 
   function toggle_playing() {
-    if (now_playing) {
+    if (playing_id) {
       $play_button.text('Play me a song!');
-      clearInterval(now_playing);
+      clearInterval(playing_id);
+      playing_id = 0;
     }
     else {
       randomize();
-      now_playing = setInterval(maybeRandomize, 300);
+      playing_id = setInterval(maybeRandomize, 300);
       $play_button.text('Stop the song');
     }
   }
