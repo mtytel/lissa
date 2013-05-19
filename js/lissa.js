@@ -179,7 +179,8 @@ lissa.figure = function() {
   var COLOR_DECAY = 0.92;
 
   var figure_context_ = null;
-  var canvas_ = null;
+  var canvas_width_ = 0;
+  var canvas_height_ = 0;
   var points = [];
   var red_ = lissa.smoothValue(255, COLOR_DECAY);
   var green_ = lissa.smoothValue(255, COLOR_DECAY);
@@ -187,15 +188,18 @@ lissa.figure = function() {
 
   function init() {
     // Setup drawing context.
-    canvas_ = document.getElementById('lissajous');
-    figure_context_ = canvas_.getContext('2d');
+    var canvas = document.getElementById('lissajous');
+    canvas_width_ = canvas.width = document.width;
+    canvas_height_ = canvas.height = document.height;
+    figure_context_ = canvas.getContext('2d');
   }
 
   function draw() {
     // Fadeout canvas a little bit.
     figure_context_.globalAlpha = 0.1;
     figure_context_.fillStyle = 'black';
-    figure_context_.fillRect(0, 0, canvas_.width + 2 * BORDER, canvas_.height + 2 * BORDER);
+    figure_context_.fillRect(0, 0, canvas_width_ + 2 * BORDER, canvas_height_ + 2 * BORDER);
+    var drawing_width = Math.min(canvas_width_, canvas_height_);
 
     // Prepare to draw.
     figure_context_.globalAlpha = 1;
@@ -206,10 +210,10 @@ lissa.figure = function() {
 
     // Draw it for Mr. Lissajous.
     for (var i = 1; i < points.length; i += 1) {
-      var x = canvas_.width / 2 + points[i][0] * (canvas_.width / 2 - BORDER);
-      var y = canvas_.height / 2 - points[i][1] * (canvas_.height / 2 - BORDER);
+      var x = canvas_width_ / 2 + points[i][0] * (drawing_width / 2 - BORDER);
+      var y = canvas_height_ / 2 - points[i][1] * (drawing_width / 2 - BORDER);
 
-      figure_context_.fillRect(x, y, 1, 1);
+      figure_context_.fillRect(x, y, 1, 5);
     }
 
     // Clear points we drew.

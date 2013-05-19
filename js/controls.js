@@ -176,7 +176,6 @@ lissa.controls.minicolors = function($container) {
     $container.each(function() {
       $(this).minicolors({
         animationSpeed: 0,
-        position: 'top',
         textfield: !$(this).hasClass('no-textfield'),
         change: function(hex, opacity) {
           var red = parseInt(hex.substring(1, 3), 16);
@@ -211,11 +210,17 @@ lissa.controls.minicolors = function($container) {
 lissa.controls.randomizer = function($container, items) {
   var $randomize_button = $container.find('.randomize').first();
   var $play_button = $container.find('.play').first();
+  var $controls_button = $container.find('.controls-toggle').first();
+  var controls_shown = false;
   var playing_id = 0;
+
+  if (!controls_shown)
+    $('.knobs').hide();
 
   function init() {
     $randomize_button.on('click', randomize);
-    $play_button.on('click', toggle_playing);
+    $play_button.on('click', togglePlaying);
+    $controls_button.on('click', toggleControls);
   }
 
   function randomize() {
@@ -230,16 +235,28 @@ lissa.controls.randomizer = function($container, items) {
     }
   }
 
-  function toggle_playing() {
+  function toggleControls() {
+    controls_shown = !controls_shown;
+    if (controls_shown) {
+      $('.knobs').fadeTo(500, 0.5);
+      $controls_button.text('Hide');
+    }
+    else {
+      $('.knobs').fadeOut(500);
+      $controls_button.text('Controls');
+    }
+  }
+
+  function togglePlaying() {
     if (playing_id) {
-      $play_button.text('Play me a song!');
+      $play_button.text('Play Song!');
       clearInterval(playing_id);
       playing_id = 0;
     }
     else {
       randomize();
       playing_id = setInterval(maybeRandomize, 300);
-      $play_button.text('Stop the song');
+      $play_button.text('Stop Song.');
     }
   }
 

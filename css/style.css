@@ -33,19 +33,25 @@ h1 {
 }
 
 #lissajous {
-  margin-top:30px;
-  display:block;
-  border:1px solid #222;
+  position:fixed;
+  left:0;
+  top:0;
+  z-index:-1;
 }
 
 .minicolors {
-  margin-top:5px;
-  display:block;
+  position:fixed !important;
+  top:13px;
+  left:345px;
 }
 
 .buttons {
   width:308px;
   padding-bottom:40px;
+}
+
+.buttons:last-child {
+  margin-right:0;
 }
 
 .oscillator {
@@ -94,12 +100,15 @@ h1 {
 }
 
 .controls {
-  margin-left:20px;
+  margin-left:10px;
   margin-right:30px;
   padding:3px 10px 10px 10px;
   width:300px;
-  display:inline;
-  float:left;
+  position:fixed;
+  left:10px;
+}
+
+.knobs {
 }
 
 .other-controls {
@@ -128,10 +137,10 @@ h1 {
   -moz-border-radius: 2px;
   border-radius: 2px;
   border: 0px;
-  margin-right:5px;
+  margin-right:1%;
   margin-bottom:5px;
   color: #ddd;
-  width: 149px;
+  width: 32%;
   height: 27px;
   font-size:16px;
   font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
