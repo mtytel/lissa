@@ -238,7 +238,7 @@ lissa.controls.randomizer = function($container, items) {
   function toggleControls() {
     controls_shown = !controls_shown;
     if (controls_shown) {
-      $('.knobs').fadeTo(500, 0.5);
+      $('.knobs').fadeTo(500, 0.75);
       $controls_button.text('Hide');
     }
     else {
