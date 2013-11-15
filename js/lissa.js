@@ -189,8 +189,8 @@ lissa.figure = function() {
   function init() {
     // Setup drawing context.
     var canvas = document.getElementById('lissajous');
-    canvas_width_ = canvas.width = document.width;
-    canvas_height_ = canvas.height = document.height;
+    canvas_width_ = canvas.width = $(document).width();
+    canvas_height_ = canvas.height = $(document).height();
     figure_context_ = canvas.getContext('2d');
   }
 
