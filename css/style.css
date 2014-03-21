@@ -12,8 +12,12 @@
 }
 
 body {
-  background-color:#111;
+  background-color:#000;
   font-family: 'myriad-pro-light', trebuchet ms, helvetica, sans;
+}
+
+a {
+  color:#444;
 }
 
 h1 {
@@ -29,7 +33,7 @@ h1 {
   padding:0;
   margin:0;
   bottom:5px;
-  right:10px;
+  right:30px;
 }
 
 #lissajous {
