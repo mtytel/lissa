@@ -10,6 +10,9 @@
  */
 
 var lissa = {};
+
+lissa.harmonograph_type = null; // 'rotary' or 'lateral'
+
 lissa.constants = {};
 
 lissa.constants.SAMPLE_RATE = 44100.0;
@@ -95,12 +98,18 @@ lissa.oscillator = function() {
     phase_offset = phase_offset_.tick();
     frequency = frequency_.tick();
     current_phase_ += frequency / lissa.constants.SAMPLE_RATE;
+    if (current_phase_ > 1.0)
+      current_phase_ -= 1.0;
 
-    var val = 0.0;
+    var val1 = 0.0;
+    var val2 = 0.0;
     _.each(amps_, function(amp, type) {
-      val += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
+      val1 += amp.tick() * lissa.waveforms[type](current_phase_ + phase_offset);
+      val2 += amp.tick() *
+              lissa.waveforms[type](current_phase_ + phase_offset + 0.25);
     });
-    return val;
+
+    return [val1, val2];
   }
 
   function setAmp(type, val) {
@@ -134,7 +143,7 @@ lissa.oscillator = function() {
 lissa.synth = function() {
   var DEFAULT_FREQ = 200.0;
 
-  function init() {
+  function init(buffer_size) {
     this.left = lissa.oscillator();
     this.left.setAmp('sin', 0.7);
     this.left.setFreq(DEFAULT_FREQ);
@@ -144,6 +153,11 @@ lissa.synth = function() {
     this.right.setAmp('sin', 0.7);
     this.right.setFreq(DEFAULT_FREQ);
     this.right.setPhase(0.25);
+
+    this.buffer_size = buffer_size;
+    this.output = [];
+    for (var i = 0; i < buffer_size; ++i)
+      this.output.push([[0.0, 0.0], [0.0, 0.0]]);
   }
 
   function clip(s) {
@@ -154,22 +168,20 @@ lissa.synth = function() {
     return s;
   }
 
-  function process(buffer) {
-    var output_left = buffer.outputBuffer.getChannelData(0);
-    var output_right = buffer.outputBuffer.getChannelData(1);
-
-    var size = output_left.length;
-    for (var i = 0; i < size; ++i) {
-      output_left[i] = clip(this.left.tick());
-      output_right[i] = clip(this.right.tick());
+  function process() {
+    for (var i = 0; i < this.buffer_size; ++i) {
+      this.output[i][0] = this.left.tick();
+      this.output[i][1] = this.right.tick();
     }
   }
 
   return {
     init: init,
     process: process,
+    buffer_size: 0,
     left: null,
     right: null,
+    output: null,
   };
 }();
 
@@ -209,11 +221,21 @@ lissa.figure = function() {
     figure_context_.fillStyle = 'rgb(' + red + ',' + green + ',' + blue + ')';
 
     // Draw it for Mr. Lissajous.
-    for (var i = 1; i < points.length; i += 1) {
-      var x = canvas_width_ / 2 + points[i][0] * (drawing_width / 2 - BORDER);
-      var y = canvas_height_ / 2 - points[i][1] * (drawing_width / 2 - BORDER);
-
-      figure_context_.fillRect(x, y, 1, 5);
+    if (lissa.harmonograph_type === 'lateral') {
+      for (var i = 1; i < points.length; i++) {
+        var x = canvas_width_ / 2 + points[i][0][0] * (drawing_width / 2 - BORDER);
+        var y = canvas_height_ / 2 - points[i][1][0] * (drawing_width / 2 - BORDER);
+        figure_context_.fillRect(x, y, 1, 5);
+      }
+    } else { // 'rotary' or 'rotaryinv'
+      var sign = lissa.harmonograph_type === 'rotary' ? 1 : -1;
+      for (var i = 1; i < points.length; i++) {
+        var osc_x = (points[i][0][0] + points[i][1][0]) * 0.5;
+        var osc_y = (points[i][0][1] + sign * points[i][1][1]) * 0.5;
+        var x = canvas_width_ / 2 + osc_x * (drawing_width / 2 - BORDER);
+        var y = canvas_height_ / 2 - osc_y * (drawing_width / 2 - BORDER);
+        figure_context_.fillRect(x, y, 1, 5);
+      }
     }
 
     // Clear points we drew.
@@ -229,15 +251,12 @@ lissa.figure = function() {
     blue_.set(b);
   }
 
-  function process(left, right) {
+  function process(osc_buffers) {
     if (points.length > BUFFER_MAX) {
       return;
     }
 
-    var size = left.length;
-    for (var i = 0; i < size; ++i) {
-      points.push([left[i], right[i]]);
-    }
+    points.push.apply(points, osc_buffers);
   }
 
   return {
@@ -249,16 +268,20 @@ lissa.figure = function() {
 }();
 
 lissa.process = function(buffer) {
+  var output_left = buffer.outputBuffer.getChannelData(0);
+  var output_right = buffer.outputBuffer.getChannelData(1);
+  var size = output_left.length;
+
   if (lissa.active) {
-    lissa.synth.process(buffer);
-    lissa.figure.process(buffer.outputBuffer.getChannelData(0),
-                         buffer.outputBuffer.getChannelData(1));
+    lissa.synth.process();
+    lissa.figure.process(lissa.synth.output);
+
+    for (var i = 0; i < size; ++i) {
+      output_left[i] = lissa.synth.output[i][0][0];
+      output_right[i] = lissa.synth.output[i][1][0];
+    }
   }
   else {
-    var output_left = buffer.outputBuffer.getChannelData(0);
-    var output_right = buffer.outputBuffer.getChannelData(1);
-
-    var size = output_left.length;
     for (var i = 0; i < size; ++i) {
       output_left[i] = 0.0;
       output_right[i] = 0.0;

@@ -152,16 +152,15 @@ lissa.controls.oscillator = function($container, title, model, base_freq_knob) {
   }
 
   function randomize() {
-    function random_int(low, high) {
-      return Math.floor((high - low + 1) * Math.random()) + low;
-    }
-
-    freq_num_knob.setVal(random_int(1,5));
-    freq_den_knob.setVal(random_int(1,5));
-    freq_milli_knob.setVal(random_int(-7,7));
-    var sin_amount = random_int(0,100);
+    freq_num_knob.setVal(lissa.utils.random_int(1,5));
+    freq_den_knob.setVal(lissa.utils.random_int(1,5));
+    freq_milli_knob.setVal(lissa.utils.random_int(-7,7));
+    var sin_amount = lissa.utils.random_int(0,100);
     sin_knob.setVal(sin_amount);
-    tri_knob.setVal(100 - sin_amount);
+    if (lissa.harmonograph_type === 'lateral')
+      tri_knob.setVal(100 - sin_amount);
+    else
+      tri_knob.setVal(0);
   }
 
   return {
@@ -265,6 +264,45 @@ lissa.controls.randomizer = function($container, items) {
   };
 };
 
+lissa.controls.harmonograph_type = function($container, model) {
+  var $buttons = $container.find('.harmonograph-type .simple-button');
+
+  model.harmonograph_type = null;
+
+  function init() {
+    $buttons.on('click', function(ev) {
+      var $this = $(this);
+      choose($this);
+    });
+    choose($($buttons[0]));
+  }
+
+  function choose($this) {
+    model.harmonograph_type = $this.data('type');
+    $buttons.removeClass('pressed');
+    $this.addClass('pressed');
+  }
+
+  function randomize() {
+    var x = Math.random();
+    var i = 0;
+    if (x < 0.5) {
+      i = 0;
+    } else if (x < 0.75) {
+      i = 1;
+    } else {
+      i = 2;
+    }
+    choose($($buttons[i]));
+    console.log('lissa.harmonograph_type', lissa.harmonograph_type);
+  }
+
+  return {
+    init: init,
+    randomize: randomize,
+  };
+};
+
 lissa.controls.init = function($container) {
   var base_freq_knob_settings = {
     label: 'BASE FREQUENCY',
@@ -304,7 +342,10 @@ lissa.controls.init = function($container) {
   var minicolors = lissa.controls.minicolors($('.minicolors'));
   minicolors.init();
 
-  var randomizer = lissa.controls.randomizer($container, [right_oscillator_control, left_oscillator_control, minicolors]);
+  var harmonograph_type = lissa.controls.harmonograph_type($container, lissa);
+  harmonograph_type.init();
+
+  var randomizer = lissa.controls.randomizer($container, [harmonograph_type, right_oscillator_control, left_oscillator_control, minicolors]);
   randomizer.init();
 };
 

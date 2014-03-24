@@ -53,6 +53,10 @@ h1 {
   width:308px;
   padding-bottom:40px;
 }
+.simple-button.pressed {
+  background-color: rgb(80, 30, 30);
+  color: #aaa;
+}
 
 .buttons:last-child {
   margin-right:0;

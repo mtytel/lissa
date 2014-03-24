@@ -7,6 +7,8 @@
  *  http://www.gnu.org/licenses/gpl.html
  */
 
+lissa.BUFFER_SIZE = 1024;
+
 lissa.init = function($) {
   if(!('webkitAudioContext' in window)) {
     alert("This uses the Web Audio API. Try opening it in Google Chrome.");
@@ -16,9 +18,9 @@ lissa.init = function($) {
   lissa.templates.init();
   var context = new webkitAudioContext();
   lissa.figure.init();
-  lissa.synth.init();
+  lissa.synth.init(lissa.BUFFER_SIZE);
 
-  var synth_processor = context.createScriptProcessor(1024, 0, 2);
+  var synth_processor = context.createScriptProcessor(lissa.BUFFER_SIZE, 0, 2);
   synth_processor.onaudioprocess = lissa.process;
 
   synth_processor.connect(context.destination);
