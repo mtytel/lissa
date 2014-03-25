@@ -10,13 +10,17 @@
 lissa.BUFFER_SIZE = 1024;
 
 lissa.init = function($) {
-  if(!('webkitAudioContext' in window)) {
-    alert("This uses the Web Audio API. Try opening it in Google Chrome.");
+  var context = null;
+  if (typeof AudioContext !== 'undefined')
+    context = new AudioContext();
+  else if (typeof webkitAudioContext !== 'undefined')
+    context = new webkitAudioContext();
+  else {
+    alert("Lissa Juice uses the Web Audio API, and your browser doesn't have it. :(");
     return;
   }
 
   lissa.templates.init();
-  var context = new webkitAudioContext();
   lissa.figure.init();
   lissa.synth.init(lissa.BUFFER_SIZE);
 
