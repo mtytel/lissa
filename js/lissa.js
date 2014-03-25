@@ -15,8 +15,6 @@ lissa.harmonograph_type = null; // 'rotary' or 'lateral'
 
 lissa.constants = {};
 
-lissa.constants.SAMPLE_RATE = 44100.0;
-
 lissa.smoothValue = function(x, decay_rate) {
   var DEFAULT_DECAY = 0.99;
 
@@ -85,10 +83,11 @@ lissa.waveforms = function() {
 }();
 
 lissa.oscillator = function() {
-  var AMP_DECAY = 0.99995;
+  var AMP_DECAY = 0.99997;
   var FREQ_DECAY = 0.997;
-  var PHASE_DECAY = 0.9994;
+  var PHASE_DECAY = 0.9997;
 
+  var sample_rate = 44100.0;
   var amps_ = {};
   var current_phase_ = 0.0;
   var frequency_ = lissa.smoothValue(0.0, FREQ_DECAY);
@@ -97,7 +96,7 @@ lissa.oscillator = function() {
   function tick() {
     phase_offset = phase_offset_.tick();
     frequency = frequency_.tick();
-    current_phase_ += frequency / lissa.constants.SAMPLE_RATE;
+    current_phase_ += frequency / sample_rate;
     if (current_phase_ > 1.0)
       current_phase_ -= 1.0;
 
@@ -119,6 +118,10 @@ lissa.oscillator = function() {
       amps_[type] = lissa.smoothValue(val, AMP_DECAY);
   }
 
+  function setSampleRate(rate) {
+    sample_rate = rate;
+  }
+
   function getAmp(type) {
     if (amps_[type]) {
       return amps_[type].get();
@@ -133,6 +136,7 @@ lissa.oscillator = function() {
     setFreq: frequency_.set,
     setPhase: phase_offset_.set,
     setAmp: setAmp,
+    setSampleRate: setSampleRate,
     getFreq: frequency_.get,
     getPhase: phase_offset_.get,
     getAmp: getAmp,
@@ -168,6 +172,11 @@ lissa.synth = function() {
     return s;
   }
 
+  function setSampleRate(sample_rate) {
+    this.left.setSampleRate(sample_rate);
+    this.right.setSampleRate(sample_rate);
+  }
+
   function process() {
     for (var i = 0; i < this.buffer_size; ++i) {
       this.output[i][0] = this.left.tick();
@@ -178,6 +187,7 @@ lissa.synth = function() {
   return {
     init: init,
     process: process,
+    setSampleRate: setSampleRate,
     buffer_size: 0,
     left: null,
     right: null,
@@ -274,6 +284,7 @@ lissa.process = function(buffer) {
   var size = output_left.length;
 
   if (lissa.active) {
+    lissa.synth.setSampleRate(buffer.outputBuffer.sampleRate);
     lissa.synth.process();
     lissa.figure.process(lissa.synth.output);
 
