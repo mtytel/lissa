@@ -207,6 +207,10 @@ lissa.figure = function() {
   }
 
   function draw() {
+    window.requestAnimationFrame(draw);
+    if (points.length === 0)
+      return;
+
     // Fadeout canvas a little bit.
     figure_context_.globalAlpha = 0.1;
     figure_context_.fillStyle = 'black';
@@ -240,9 +244,6 @@ lissa.figure = function() {
 
     // Clear points we drew.
     points = [];
-
-    // Request next run.
-    window.requestAnimationFrame(draw);
   }
 
   function setColor(r, g, b) {

@@ -294,7 +294,6 @@ lissa.controls.harmonograph_type = function($container, model) {
       i = 2;
     }
     choose($($buttons[i]));
-    console.log('lissa.harmonograph_type', lissa.harmonograph_type);
   }
 
   return {
