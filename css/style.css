@@ -26,6 +26,21 @@ h1 {
   margin:0 0 0 0;
 }
 
+#start-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: black;
+    z-index: 1000;
+}
+.simple-button.start {
+    width: 20%;
+    margin-left: 40%;
+    margin-top: 10%;
+}
+
 .info {
   color:#444;
   font-style:italic;

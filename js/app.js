@@ -41,7 +41,12 @@ lissa.init = function($) {
 };
 
 (function($){
-  $(document).ready(function(){
-    lissa.init($);
-  });
+  window.onload = function() {
+    $('.simple-button.start').click(function(){
+      $('#start-cover').css('display', 'none');
+      lissa.init($);
+    });
+    // only show the start button once clicking it will actually do something
+    $('.simple-button.start').css('display', 'inline');
+  };
 })(jQuery);
